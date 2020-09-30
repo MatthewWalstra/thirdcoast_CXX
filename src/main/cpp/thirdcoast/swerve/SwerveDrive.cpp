@@ -7,12 +7,13 @@
 
 #include "thirdcoast/swerve/SwerveDrive.h"
 
-using namespace Thirdcoast;
+//using namespace Thirdcoast;
 
-SwerveDrive::SwerveDrive(SwerveDriveConfig config) 
+Thirdcoast::SwerveDrive::SwerveDrive(SwerveDriveConfig config) 
 {
     //Calculate Width and Length components
     gyro = config.gyro;
+    wheels = config.wheels;
     double length = config.length;
     double width = config.width;
     double radius = std::hypot(length, width);
@@ -35,14 +36,15 @@ SwerveDrive::SwerveDrive(SwerveDriveConfig config)
     {
         kGyroRateCorrection = 0.0;
     }   
+    frc::SmartDashboard::PutNumber("Gyro Rate Correction", kGyroRateCorrection);
 }
 
-std::string SwerveDrive::getPreferenceKeyForWheel(int wheel)
+std::string Thirdcoast::SwerveDrive::getPreferenceKeyForWheel(int wheel)
 {
     return "SwerveDrive/wheel." + Util::sstr(wheel);
 }
 
-void SwerveDrive::setDriveMode(Wheel::DriveMode driveMode)
+void Thirdcoast::SwerveDrive::setDriveMode(Wheel::DriveMode driveMode)
 {
     for (auto wheel : wheels)
     {
@@ -50,7 +52,7 @@ void SwerveDrive::setDriveMode(Wheel::DriveMode driveMode)
     }
 }
 
-void SwerveDrive::set(double azimuth, double drive)
+void Thirdcoast::SwerveDrive::set(double azimuth, double drive)
 {
     for (auto wheel : wheels)
     {
@@ -58,19 +60,20 @@ void SwerveDrive::set(double azimuth, double drive)
     }
 }
 
-void SwerveDrive::drive(double forward, double strafe, double azimuth)
+void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimuth)
 {
     // Use gyro for field-oriented drive. We use getAngle instead of getYaw to enable arbitrary
     // autonomous starting positions.
     if (fieldOriented)
     {
         double angle = gyro->GetFusedHeading();
+        //double angle = gyro->GetYaw();
         angle += gyro->GetRate() * kGyroRateCorrection;
         angle = std::fmod(angle, 360.0);
 
         angle = Util::degToRads(angle);
         const double tmp = forward * std::cos(angle) + strafe * std::sin(angle);
-        strafe = strafe * std::cos(angle) - forward * std::cos(angle);
+        strafe = strafe * std::cos(angle) - forward * std::sin(angle);
         forward = tmp;
     }
 
@@ -107,7 +110,7 @@ void SwerveDrive::drive(double forward, double strafe, double azimuth)
     }
 }
 
-void SwerveDrive::stop()
+void Thirdcoast::SwerveDrive::stop()
 {
     for (auto wheel : wheels)
     {
@@ -115,12 +118,12 @@ void SwerveDrive::stop()
     }
 }
 
-void SwerveDrive::saveAzimuthPositions()
+void Thirdcoast::SwerveDrive::saveAzimuthPositions()
 {
     saveAzimuthPositions(frc::Preferences::GetInstance());
 }
 
-void SwerveDrive::saveAzimuthPositions(frc::Preferences *prefs)
+void Thirdcoast::SwerveDrive::saveAzimuthPositions(frc::Preferences *prefs)
 {
     for (int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
     {
@@ -129,17 +132,26 @@ void SwerveDrive::saveAzimuthPositions(frc::Preferences *prefs)
     }
 }
 
-void SwerveDrive::zeroAzimuthEncoders()
+void Thirdcoast::SwerveDrive::zeroAzimuthEncoders()
 {
     zeroAzimuthEncoders(frc::Preferences::GetInstance());
 }
 
-void SwerveDrive::zeroAzimuthEncoders(frc::Preferences *prefs)
+void Thirdcoast::SwerveDrive::zeroAzimuthEncoders(frc::Preferences *prefs)
 {
     for (int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
     {
         int position = prefs->GetInt(getPreferenceKeyForWheel(i), DEFAULT_ABSOLUTE_AZIMUTH_OFFSET);
         
         wheels.at(i)->setAzimuthPosition(position);
+    }
+}
+
+void Thirdcoast::SwerveDrive::outputSmartDashboard()
+{
+    for (int i = 0; i < Thirdcoast::SwerveDriveConfig::WHEEL_COUNT; i++)
+    {
+        frc::SmartDashboard::PutNumber("Drive Output: " + Util::sstr(i), ws[i]);
+        frc::SmartDashboard::PutNumber("Azimuth Output: " + Util::sstr(i), wa[i]);
     }
 }

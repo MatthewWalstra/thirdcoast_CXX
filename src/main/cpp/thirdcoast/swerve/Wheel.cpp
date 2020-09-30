@@ -7,9 +7,9 @@
 
 #include "thirdcoast/swerve/Wheel.h"
 
-using namespace Thirdcoast;
+//using namespace Thirdcoast;
 
-Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax) 
+Thirdcoast::Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax) 
 {
     azimuthController = azimuth;
     driveController = drive;
@@ -18,7 +18,7 @@ Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax
     setDriveMode(DriveMode::TELEOP);
 }
 
-void Wheel::set(double azimuth, double drive)
+void Thirdcoast::Wheel::set(double azimuth, double drive)
 {
     if (Util::epsilonEquals(drive, 0.0))
     {
@@ -43,35 +43,35 @@ void Wheel::set(double azimuth, double drive)
     driveController->GetPIDController().SetReference(drive, rev::ControlType::kDutyCycle);
 }
 
-void Wheel::setAzimuthPosition(int position)
+void Thirdcoast::Wheel::setAzimuthPosition(int position)
 {
     azimuthController->Set(ControlMode::MotionMagic, position);
 }
 
-void Wheel::disableAzimuth()
+void Thirdcoast::Wheel::disableAzimuth()
 {
     azimuthController->NeutralOutput();
 }
 
-void Wheel::setDriveMode(DriveMode driveMode)
+void Thirdcoast::Wheel::setDriveMode(DriveMode driveMode)
 {
     this->driveMode = driveMode;
 }
 
-void Wheel::stop()
+void Thirdcoast::Wheel::stop()
 {
     azimuthController->Set(ControlMode::MotionMagic, azimuthController->GetSelectedSensorPosition(0));
     driveController->GetPIDController().SetReference(0.0, rev::ControlType::kDutyCycle);
 }
 
-void Wheel::setAzimuthZero(int zero)
+void Thirdcoast::Wheel::setAzimuthZero(int zero)
 {
     int azimuthSetpoint = getAzimuthAbsolutePosition() - zero;
     azimuthController->SetSelectedSensorPosition(azimuthSetpoint, 0, 10);
     azimuthController->Set(ControlMode::MotionMagic, azimuthSetpoint);
 }
 
-int Wheel::getAzimuthAbsolutePosition()
+int Thirdcoast::Wheel::getAzimuthAbsolutePosition()
 {
     return azimuthController->GetSensorCollection().GetPulseWidthPosition();
 }

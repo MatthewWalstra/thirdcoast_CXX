@@ -17,6 +17,7 @@
 
 #include <AHRS.h>
 #include <frc/Preferences.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 namespace Thirdcoast {
 
@@ -163,6 +164,18 @@ class SwerveDrive {
   {
     return kWidthComponent;
   }
+
+  std::array<double, SwerveDriveConfig::WHEEL_COUNT> getWS()
+  {
+    return ws;
+  }
+
+  std::array<double, SwerveDriveConfig::WHEEL_COUNT> getWA()
+  {
+    return wa;
+  }
+
+  void outputSmartDashboard();
 };
 
 }

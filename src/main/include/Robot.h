@@ -20,6 +20,8 @@
 #include <rev/CANSparkMax.h>
 
 #include <frc/TimedRobot.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+
 
 class Robot : public frc::TimedRobot {
   ControlBoard::XBoxController controller{0};

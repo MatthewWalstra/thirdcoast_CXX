@@ -14,6 +14,7 @@
 #include <memory>
 
 #include "thirdcoast/swerve/Wheel.h"
+
 namespace Thirdcoast {
 
 class SwerveDriveConfig {
@@ -46,3 +47,5 @@ class SwerveDriveConfig {
   double gyroRateCoeff = 0.0;
 
 };
+
+}

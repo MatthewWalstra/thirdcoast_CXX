@@ -6,10 +6,17 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Robot.h"
+#include <iostream>
 
 void Robot::RobotInit() 
 {
     drive = configSwerve();
+//    frc::SmartDashboard::PutNumber("Nullptr TalonSRX", drive->wheels.at)
+    drive->getGyro()->ZeroYaw();
+
+    //drive->drive(.7,.5, 0.4);
+    //frc::SmartDashboard::PutNumber("TestDrive:", drive->getWS()[0]);
+    //frc::SmartDashboard::PutNumber("TestAzimuth:", drive->getWA()[0]);
 }
 
 void Robot::RobotPeriodic() {}
@@ -25,17 +32,34 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic() 
 {
+    drive->outputSmartDashboard();
+    frc::SmartDashboard::PutNumber("Forward (Pre Expo)", getForward());
+    frc::SmartDashboard::PutNumber("Strafe (Pre Expo)", getStrafe());
+    frc::SmartDashboard::PutNumber("Yaw (Pre Expo)", getYaw());
+    
     double yaw = yawExpo.apply(getYaw());
     double forward = driveExpo.apply(getForward());
     double strafe = driveExpo.apply(getStrafe());
+
+    frc::SmartDashboard::PutNumber("Forward (Pre Limit)", forward);
+    frc::SmartDashboard::PutNumber("Strafe (Pre Limit)", strafe);
+    frc::SmartDashboard::PutNumber("Yaw (Pre Limit)", yaw);
+
+    frc::SmartDashboard::PutNumber("Forward (Delta expo)", getForward() - forward);
+    frc::SmartDashboard::PutNumber("Strafe (Delta expo)", getStrafe() - strafe);
+    frc::SmartDashboard::PutNumber("Yaw (Delta expo)", getYaw() - yaw);
 
     forward = Util::limit(forward, Constants::MAX_FWD_STR);
     strafe = Util::limit(strafe, Constants::MAX_FWD_STR);
     yaw = Util::limit(yaw, Constants::MAX_YAW);
 
+    frc::SmartDashboard::PutNumber("Forward", forward);
+    frc::SmartDashboard::PutNumber("Strafe", strafe);
+    frc::SmartDashboard::PutNumber("Yaw", yaw);
     std::array<double, 2> output = vectorLimit.apply(forward, strafe);
 
     drive->drive(output[0], output[1], yaw);
+    
 }
 
 void Robot::DisabledInit() {}
@@ -74,6 +98,7 @@ std::array<std::shared_ptr<Thirdcoast::Wheel>, Thirdcoast::SwerveDriveConfig::WH
 {
 
     // configure Azimuth Talons
+    //std::cout<<"Started Talon Config"<<std::endl;
     TalonSRXConfiguration azimuthConfig{};
     azimuthConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice::CTRE_MagEncoder_Relative;
     azimuthConfig.continuousCurrentLimit = 10;
@@ -90,18 +115,20 @@ std::array<std::shared_ptr<Thirdcoast::Wheel>, Thirdcoast::SwerveDriveConfig::WH
     azimuthConfig.velocityMeasurementWindow = 64;
     azimuthConfig.voltageCompSaturation = 12;
 
-
+    //std::cout<<"Creating Array"<<std::endl;
     // create wheel array
     std::array<std::shared_ptr<Thirdcoast::Wheel>, Thirdcoast::SwerveDriveConfig::WHEEL_COUNT> wheels;
 
     for (int i = 0; i < Thirdcoast::SwerveDriveConfig::WHEEL_COUNT; i++)
     {
+        //std::cout<<"Creating Talon"<<std::endl;
         std::shared_ptr<TalonSRX> azimuthTalon = std::make_shared<TalonSRX>(i);
         azimuthTalon->ConfigAllSettings(azimuthConfig);
         azimuthTalon->EnableCurrentLimit(true);
         azimuthTalon->EnableVoltageCompensation(true);
         azimuthTalon->SetNeutralMode(NeutralMode::Coast);
 
+        //std::cout<<"Creating Spark Max"<<std::endl;
         std::shared_ptr<rev::CANSparkMax> driveSparkMax = std::make_shared<rev::CANSparkMax>(i + 10, rev::CANSparkMax::MotorType::kBrushless);
         driveSparkMax->SetSmartCurrentLimit(40);
         driveSparkMax->GetPIDController().SetP(.05);
@@ -115,6 +142,7 @@ std::array<std::shared_ptr<Thirdcoast::Wheel>, Thirdcoast::SwerveDriveConfig::WH
 
         std::shared_ptr<Thirdcoast::Wheel> wheel = std::make_shared<Thirdcoast::Wheel>(azimuthTalon, driveSparkMax, Constants::DRIVE_SETPOINT_MAX);
         wheels[i] = wheel;
+        //std::cout<<"created wheel "<< i <<azimuthTalon->GetSensorCollection().GetPulseWidthPosition() <<std::endl;
     }
 
     return wheels;
