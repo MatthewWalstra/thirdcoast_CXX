@@ -9,7 +9,12 @@
 
 #include <vector>
 #include <memory>
+#define _USE_MATH_DEFINES
 #include <cmath>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #include "thirdcoast/swerve/SwerveDriveConfig.h"
 #include "thirdcoast/swerve/Wheel.h"
@@ -20,6 +25,25 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 namespace Thirdcoast {
+
+/**
+ * Control a Third Coast swerve drive.
+ *
+ * <p>Wheels are a array numbered 0-3 from front to back, with even numbers on the left side when
+ * facing forward.
+ * 
+ * Forward: Azimuth controller CAN IDs (+10 for drive motor controller)
+ * 
+ * 0     1
+ *  * * * 
+ *  * * *
+ * 2     3 
+ *
+ * <p>Derivation of inverse kinematic equations are from Ether's <a
+ * href="https://www.chiefdelphi.com/media/papers/2426">Swerve Kinematics and Programming</a>.
+ *
+ * @see Wheel
+ */
 
 class SwerveDrive {
   double DEFAULT_ABSOLUTE_AZIMUTH_OFFSET = 200;
@@ -33,7 +57,11 @@ class SwerveDrive {
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> ws = {0.0, 0.0, 0.0, 0.0};
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> wa  = {0.0, 0.0, 0.0, 0.0};
 
+  std::array<int, SwerveDriveConfig::WHEEL_COUNT> ZeroPositions  = {48112, -47876, 13236, -4385};
+
   bool fieldOriented;
+  bool enableTuning = false;
+  bool enableSmartDashboardOutput;
 
  public:
 
@@ -72,12 +100,20 @@ class SwerveDrive {
    */
   void drive(double forward, double strafe, double azimuth);
 
+  void drive(double forward, double strafe, double azimuth, double angle);
+
+  void generateTestCases();
+
   /**
    * Stops all wheels' azimuth and drive movement. Calling this in the robots {@code teleopInit} and
    * {@code autonomousInit} will reset wheel azimuth relative encoders to the current position and
    * thereby prevent wheel rotation if the wheels were moved manually while the robot was disabled.
    */
   void stop();
+  /**
+   * Outputs setpoints to smartdashboard
+   */
+  void outputToSmartDashboard();
 
   /**
    * Save the wheels' azimuth current position as read by absolute encoder. These values are saved
@@ -125,6 +161,16 @@ class SwerveDrive {
   }
 
   /**
+   * Reset Gyro to zero
+   * 
+   */
+
+  void resetGyro()
+  {
+    gyro->Reset();
+  }
+
+  /**
    * Get status of field-oriented driving.
    *
    * @return status of field-oriented driving.
@@ -143,6 +189,22 @@ class SwerveDrive {
   void setFieldOriented(bool enabled)
   {
     fieldOriented = enabled;
+  }
+
+  /**
+   * Get status of whether azimuth tuning is enabled
+   */
+  bool isEnableTuning()
+  {
+    return enableTuning;
+  }
+
+  /**
+   * Enable or disable azimuth tuning
+   **/
+  void setEnableTuning(bool enable)
+  {
+    enableTuning = enable;
   }
 
   /**
@@ -175,7 +237,6 @@ class SwerveDrive {
     return wa;
   }
 
-  void outputSmartDashboard();
 };
 
 }

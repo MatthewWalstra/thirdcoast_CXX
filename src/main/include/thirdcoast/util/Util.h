@@ -2,6 +2,7 @@
 
 #include <string>
 #include <math.h>
+#include <iomanip>
 
 
 class Util {
@@ -35,12 +36,12 @@ class Util {
         return epsilonEquals(x, y, kEpsilon);
     }
 
-    template < typename... Args >
-    static std::string sstr( Args &&... args )
+    template < class T >
+    static std::string sstr( T args )
     {
         std::ostringstream sstr;
         // fold expression
-        ( sstr << std::dec << ... << args );
+        ( sstr << std::setprecision(2) << std::fixed << args );
         return sstr.str();
     }
 

@@ -2,8 +2,8 @@
 
 namespace Constants {
     
-    const double ROBOT_LENGTH = 25.0;
-    const double ROBOT_WIDTH = 25.0;
+    const double ROBOT_LENGTH = 22.0;
+    const double ROBOT_WIDTH = 22.0;
     const double DRIVE_SETPOINT_MAX = 5500.0;
     const double DEADBAND = 0.05;
     const double YAW_EXPO = 0.65;

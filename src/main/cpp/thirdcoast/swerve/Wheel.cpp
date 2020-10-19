@@ -9,16 +9,16 @@
 
 //using namespace Thirdcoast;
 
-Thirdcoast::Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax) 
+Thirdcoast::Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax, int id) : azimuthController(azimuth), driveController(drive), driveSetpointMax(driveSetpointMax), id(id)
 {
     azimuthController = azimuth;
     driveController = drive;
     this->driveSetpointMax = driveSetpointMax;
-
+    this->id = id;
     setDriveMode(DriveMode::TELEOP);
 }
 
-void Thirdcoast::Wheel::set(double azimuth, double drive)
+void Thirdcoast::Wheel::set(double azimuth, double drive, bool output_smartdashboard)
 {
     if (Util::epsilonEquals(drive, 0.0))
     {
@@ -26,26 +26,38 @@ void Thirdcoast::Wheel::set(double azimuth, double drive)
         return;
     }
 
-    //azimuth *= -TICKS; //flip azimuth hardware configuration dependent
+    azimuth *= TICKS; //*= -TICKS; flip azimuth hardware configuration dependent
 
     double azimuthPosition = azimuthController->GetSelectedSensorPosition(0);
     double azimuthError = std::fmod(azimuth - azimuthPosition, TICKS);
 
     //minimize azimuth rotation, reversing drive if necessary
+    
     inverted = std::fabs(azimuthError) > .25 * TICKS;
     if (inverted)
     {
         azimuthError -= std::copysign(0.5 * TICKS, azimuthError);
         drive = -drive;
     }
+    
+    if (output_smartdashboard)
+    {
+        frc::SmartDashboard::PutNumber("Thirdcoast/Swerve/Drive_" + Util::sstr(id) + " setpoint", drive);
+        frc::SmartDashboard::PutNumber("Thirdcoast/Swerve/Azimuth_" + Util::sstr(id) + " setpoint", azimuthPosition + azimuthError);
+        frc::SmartDashboard::PutNumber("Thirdcoast/Swerve/Azimuth_" + Util::sstr(id) + " position", azimuthPosition);
+        frc::SmartDashboard::PutNumber("Thirdcoast/Swerve/Azimuth_" + Util::sstr(id) + " error", azimuthError);
+        frc::SmartDashboard::PutNumber("Thirdcoast/Swerve/Azimuth_" + Util::sstr(id) + " zero", azimuth_zero);
+    }
+    
 
-    azimuthController->Set(ControlMode::MotionMagic, azimuthPosition + azimuthError);
-    driveController->GetPIDController().SetReference(drive, rev::ControlType::kDutyCycle);
+    azimuthController->Set(ControlMode::Position, azimuthPosition + azimuthError);
+    driveController->Set(drive);
 }
 
 void Thirdcoast::Wheel::setAzimuthPosition(int position)
 {
     azimuthController->Set(ControlMode::MotionMagic, position);
+    //frc::SmartDashboard::PutNumber("Thirdcoast/Swerve/Azimuth_" + Util::sstr(id) + " position", azimuthController->GetSelectedSensorPosition(0));
 }
 
 void Thirdcoast::Wheel::disableAzimuth()
@@ -66,6 +78,7 @@ void Thirdcoast::Wheel::stop()
 
 void Thirdcoast::Wheel::setAzimuthZero(int zero)
 {
+    azimuth_zero = zero;
     int azimuthSetpoint = getAzimuthAbsolutePosition() - zero;
     azimuthController->SetSelectedSensorPosition(azimuthSetpoint, 0, 10);
     azimuthController->Set(ControlMode::MotionMagic, azimuthSetpoint);

@@ -7,12 +7,14 @@
 
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <memory>
 
 #include <ctre/Phoenix.h>
 #include <rev/CANSparkMax.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "thirdcoast/util/Util.h"
 
@@ -41,6 +43,8 @@ class Wheel {
   std::shared_ptr<TalonSRX> azimuthController;
   std::shared_ptr<rev::CANSparkMax> driveController;
   bool inverted = false;
+  int id;
+  int azimuth_zero = 0;
 
   
  public:
@@ -63,7 +67,7 @@ class Wheel {
    * @param drive the configured drive TalonSRX
    * @param driveSetpointMax scales closed-loop drive output to this value when drive setpoint = 1.0
    */
-  Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax);
+  Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax, int id);
 
   /**
    * This method calculates the optimal driveTalon settings and applies them.
@@ -72,7 +76,7 @@ class Wheel {
    *     position
    * @param drive 0 to 1.0 in the direction of the wheel azimuth
    */
-  void set(double azimuth, double drive);
+  void set(double azimuth, double drive, bool output_smartdashboard);
 
   /**
    * Set azimuth to encoder position.
@@ -144,6 +148,9 @@ class Wheel {
   double getDriveSetpointMax(){return driveSetpointMax;}
 
   bool isInverted(){return inverted;}
+
+  int getAzimuthZero(){return azimuth_zero;}
+
 
 };
 
