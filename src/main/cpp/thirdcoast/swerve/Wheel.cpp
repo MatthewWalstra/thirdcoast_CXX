@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "thirdcoast/swerve/Wheel.h"
+#include <iostream>
 
 //using namespace Thirdcoast;
 
@@ -37,6 +38,8 @@ void Thirdcoast::Wheel::set(double azimuth, double drive)
     {
         azimuthError -= std::copysign(0.5 * TICKS, azimuthError);
         drive = -drive;
+
+        
     }
 
     azimuthController->Set(ControlMode::MotionMagic, azimuthPosition + azimuthError);

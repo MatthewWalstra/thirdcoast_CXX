@@ -33,10 +33,11 @@ void Robot::TeleopInit()
 void Robot::TeleopPeriodic() 
 {
     drive->outputSmartDashboard();
+    
     frc::SmartDashboard::PutNumber("Forward (Pre Expo)", getForward());
     frc::SmartDashboard::PutNumber("Strafe (Pre Expo)", getStrafe());
     frc::SmartDashboard::PutNumber("Yaw (Pre Expo)", getYaw());
-    
+    /*
     double yaw = yawExpo.apply(getYaw());
     double forward = driveExpo.apply(getForward());
     double strafe = driveExpo.apply(getStrafe());
@@ -60,6 +61,12 @@ void Robot::TeleopPeriodic()
 
     drive->drive(output[0], output[1], yaw);
     
+    */
+    double forward = getForward();
+    double strafe = getStrafe();
+    double yaw = getYaw();
+
+    drive->drive(forward, strafe, yaw);
 }
 
 void Robot::DisabledInit() {}
