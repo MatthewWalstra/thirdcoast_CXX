@@ -100,8 +100,7 @@ class SwerveDrive {
    */
   void drive(double forward, double strafe, double azimuth);
 
-  void drive(double forward, double strafe, double azimuth, double angle);
-
+  //currently broken, add 4th argument angle to drive
   void generateTestCases();
 
   /**

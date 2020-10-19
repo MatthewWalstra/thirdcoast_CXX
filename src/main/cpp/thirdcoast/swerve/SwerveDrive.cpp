@@ -60,25 +60,22 @@ void Thirdcoast::SwerveDrive::set(double azimuth, double drive)
     }
 }
 
-void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimuth)
-{
-    drive(forward, strafe, azimuth, 0);
-}
 
-void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimuth, double angle)
+void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimuth)
 {
     // Use gyro for field-oriented drive. We use getAngle instead of getYaw to enable arbitrary
     // autonomous starting positions.
-    //if (fieldOriented)
+    if (fieldOriented)
+    {
+        double angle = gyro->GetAngle();
+        angle += gyro->GetRate() * kGyroRateCorrection;
+        angle = std::fmod(angle, 360.0);
 
-        //double angle = gyro->GetAngle();
-    //angle += gyro->GetRate() * kGyroRateCorrection;
-    angle = std::fmod(angle, 360.0);
-
-    angle = Util::degToRads(angle);
-    const double tmp = forward * std::cos(angle) + strafe * std::sin(angle);
-    strafe = strafe * std::cos(angle) - forward * std::sin(angle);
-    forward = tmp;
+        angle = Util::degToRads(angle);
+        const double tmp = forward * std::cos(angle) + strafe * std::sin(angle);
+        strafe = strafe * std::cos(angle) - forward * std::sin(angle);
+        forward = tmp;
+    }
 
     const double a = strafe - azimuth * kLengthComponent;
     const double b = strafe + azimuth * kLengthComponent;
@@ -143,7 +140,7 @@ void Thirdcoast::SwerveDrive::generateTestCases()
             while (yaw <= 1.0)
             {
 
-              drive(forward, strafe, yaw, angle);
+              //drive(forward, strafe, yaw, angle);
               mOutput << Util::sstr(forward) + ", " + Util::sstr(strafe) + ", " + Util::sstr(yaw) + ", " + Util::sstr(angle) + ", " + Util::sstr(ws[0]) + ", " + Util::sstr(wa[0]) + ", " + Util::sstr(ws[1]) + ", " + Util::sstr(wa[1]) + ", " + Util::sstr(ws[2]) + ", " + Util::sstr(wa[2]) + ", " + Util::sstr(ws[3]) + ", " + Util::sstr(wa[3]) + ", " << std::endl;
               
               yaw += value_step;
