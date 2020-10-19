@@ -10,11 +10,12 @@
 
 //using namespace Thirdcoast;
 
-Thirdcoast::Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax) 
+Thirdcoast::Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax, int id) 
 {
     azimuthController = azimuth;
     driveController = drive;
     this->driveSetpointMax = driveSetpointMax;
+    this->id = id;
 
     setDriveMode(DriveMode::TELEOP);
 }
@@ -27,20 +28,27 @@ void Thirdcoast::Wheel::set(double azimuth, double drive)
         return;
     }
 
-    //azimuth *= -TICKS; //flip azimuth hardware configuration dependent
+    azimuth *= -TICKS; //flip azimuth hardware configuration dependent
 
     double azimuthPosition = azimuthController->GetSelectedSensorPosition(0);
     double azimuthError = std::fmod(azimuth - azimuthPosition, TICKS);
 
     //minimize azimuth rotation, reversing drive if necessary
     inverted = std::fabs(azimuthError) > .25 * TICKS;
+
+    std::string flipped = "";
+
     if (inverted)
     {
         azimuthError -= std::copysign(0.5 * TICKS, azimuthError);
         drive = -drive;
 
-        
+        flipped = ": flipped ";
     }
+
+    stream << std::fixed << std::setprecision(4) << "Azimuth " << id << " ( Position: " << azimuthPosition << ", Error: " << azimuthError << ", Setpoint: " << azimuth << " )" << flipped << std::endl;
+
+    //std::cout <<stream.str();
 
     azimuthController->Set(ControlMode::MotionMagic, azimuthPosition + azimuthError);
     driveController->GetPIDController().SetReference(drive, rev::ControlType::kDutyCycle);
@@ -48,7 +56,7 @@ void Thirdcoast::Wheel::set(double azimuth, double drive)
 
 void Thirdcoast::Wheel::setAzimuthPosition(int position)
 {
-    azimuthController->Set(ControlMode::MotionMagic, position);
+    azimuthController->Set(ControlMode::Position, position);
 }
 
 void Thirdcoast::Wheel::disableAzimuth()
@@ -77,4 +85,9 @@ void Thirdcoast::Wheel::setAzimuthZero(int zero)
 int Thirdcoast::Wheel::getAzimuthAbsolutePosition()
 {
     return azimuthController->GetSensorCollection().GetPulseWidthPosition();
+}
+
+std::string Thirdcoast::Wheel::getString()
+{
+    return stream.str();
 }

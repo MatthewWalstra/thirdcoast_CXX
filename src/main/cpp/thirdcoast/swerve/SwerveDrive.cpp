@@ -11,6 +11,9 @@
 
 Thirdcoast::SwerveDrive::SwerveDrive(SwerveDriveConfig config) 
 {
+    //open wheel flip debugging file
+    mWheelOutput.open("/home/lvuser/Wheel_Data.txt", std::ios::out | std::ios::app);
+
     //Calculate Width and Length components
     gyro = config.gyro;
     wheels = config.wheels;
@@ -66,8 +69,8 @@ void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimut
     // autonomous starting positions.
     if (fieldOriented)
     {
-        double angle = gyro->GetFusedHeading();
-        //double angle = gyro->GetYaw();
+        //double angle = gyro->GetFusedHeading();
+        double angle = gyro->GetAngle();
         angle += gyro->GetRate() * kGyroRateCorrection;
         angle = std::fmod(angle, 360.0);
 
@@ -107,6 +110,11 @@ void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimut
     for(int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
     {
         wheels.at(i)->set(wa.at(i), ws.at(i));
+    }
+
+    for(int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
+    {
+        mWheelOutput << wheels.at(i)->getString();
     }
 }
 

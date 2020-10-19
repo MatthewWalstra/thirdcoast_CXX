@@ -7,8 +7,12 @@
 
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <memory>
+#include <sstream>
+#include <string>
+#include <iomanip>
 
 #include <ctre/Phoenix.h>
 #include <rev/CANSparkMax.h>
@@ -41,6 +45,9 @@ class Wheel {
   std::shared_ptr<TalonSRX> azimuthController;
   std::shared_ptr<rev::CANSparkMax> driveController;
   bool inverted = false;
+  int id = 0;
+
+  std::stringstream stream;
 
   
  public:
@@ -63,7 +70,7 @@ class Wheel {
    * @param drive the configured drive TalonSRX
    * @param driveSetpointMax scales closed-loop drive output to this value when drive setpoint = 1.0
    */
-  Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax);
+  Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax, int id);
 
   /**
    * This method calculates the optimal driveTalon settings and applies them.
@@ -144,6 +151,8 @@ class Wheel {
   double getDriveSetpointMax(){return driveSetpointMax;}
 
   bool isInverted(){return inverted;}
+
+  std::string getString();
 
 };
 

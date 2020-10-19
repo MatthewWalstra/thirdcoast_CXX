@@ -147,7 +147,7 @@ std::array<std::shared_ptr<Thirdcoast::Wheel>, Thirdcoast::SwerveDriveConfig::WH
         driveSparkMax->EnableVoltageCompensation(12.0);
         driveSparkMax->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 
-        std::shared_ptr<Thirdcoast::Wheel> wheel = std::make_shared<Thirdcoast::Wheel>(azimuthTalon, driveSparkMax, Constants::DRIVE_SETPOINT_MAX);
+        std::shared_ptr<Thirdcoast::Wheel> wheel = std::make_shared<Thirdcoast::Wheel>(azimuthTalon, driveSparkMax, Constants::DRIVE_SETPOINT_MAX, i);
         wheels[i] = wheel;
         //std::cout<<"created wheel "<< i <<azimuthTalon->GetSensorCollection().GetPulseWidthPosition() <<std::endl;
     }

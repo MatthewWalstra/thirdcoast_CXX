@@ -9,7 +9,12 @@
 
 #include <vector>
 #include <memory>
+#define _USE_MATH_DEFINES
 #include <cmath>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #include "thirdcoast/swerve/SwerveDriveConfig.h"
 #include "thirdcoast/swerve/Wheel.h"
@@ -34,6 +39,7 @@ class SwerveDrive {
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> wa  = {0.0, 0.0, 0.0, 0.0};
 
   bool fieldOriented;
+  std::fstream mWheelOutput;
 
  public:
 
@@ -176,6 +182,7 @@ class SwerveDrive {
   }
 
   void outputSmartDashboard();
+
 };
 
 }
