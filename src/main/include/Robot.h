@@ -13,6 +13,7 @@
 #include "XBoxController.h"
 #include "thirdcoast/util/ExpoScale.h"
 #include "thirdcoast/util/VectorRateLimit.h"
+#include "thirdcoast/swerve/AzimuthZeroTuner.h"
 
 #include "Constants.h"
 
@@ -22,10 +23,19 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+#include <iostream>
 
 class Robot : public frc::TimedRobot {
+  //declare controller and drive
   ControlBoard::XBoxController controller{0};
   std::shared_ptr<Thirdcoast::SwerveDrive> drive;
+
+  Thirdcoast::AzimuthZeroTuner azimuthTuner{};
+
+  bool prev_save = false;
+  bool prev_reset = false;
+
+  //declare rate limiters
   ExpoScale yawExpo{Constants::DEADBAND, Constants::YAW_EXPO};
   ExpoScale driveExpo{Constants::DEADBAND, Constants::DRIVE_EXPO};
   VectorRateLimit vectorLimit{Constants::VECTOR_LIMIT};
@@ -45,9 +55,25 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
+  /**
+   * @return xbox controller joysticks values
+   * Forward = Left Y
+   * Strafe = Left X
+   * Yaw = Right X
+   **/
   double getForward();
   double getStrafe();
   double getYaw();
+
+  /**
+   * @return true, if A && B && X && Y are pressed
+   **/
+  bool getAzimuthSaveTrigger();
+  
+   /**
+   * @return true, if start is pressed
+   **/
+  bool getAzimuthResetTrigger();
 
   std::shared_ptr<Thirdcoast::SwerveDrive> configSwerve();
   std::array<std::shared_ptr<Thirdcoast::Wheel>, Thirdcoast::SwerveDriveConfig::WHEEL_COUNT> getWheels();

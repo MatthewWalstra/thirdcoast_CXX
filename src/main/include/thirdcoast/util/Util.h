@@ -2,6 +2,7 @@
 
 #include <string>
 #include <math.h>
+#include <iomanip>
 
 
 class Util {
@@ -40,7 +41,7 @@ class Util {
     {
         std::ostringstream sstr;
         // fold expression
-        ( sstr << std::dec << args );
+        ( sstr << std::setprecision(2) << std::fixed << args );
         return sstr.str();
     }
 

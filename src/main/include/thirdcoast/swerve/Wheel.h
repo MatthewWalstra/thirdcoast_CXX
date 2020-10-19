@@ -17,6 +17,7 @@
 #include <ctre/Phoenix.h>
 #include <rev/CANSparkMax.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "thirdcoast/util/Util.h"
 
@@ -46,6 +47,8 @@ class Wheel {
   std::shared_ptr<rev::CANSparkMax> driveController;
   bool inverted = false;
   int id = 0;
+
+  int azimuth_zero = 0;
 
   std::stringstream stream;
 
@@ -79,7 +82,7 @@ class Wheel {
    *     position
    * @param drive 0 to 1.0 in the direction of the wheel azimuth
    */
-  void set(double azimuth, double drive);
+  void set(double azimuth, double drive, bool output_smartdashboard);
 
   /**
    * Set azimuth to encoder position.

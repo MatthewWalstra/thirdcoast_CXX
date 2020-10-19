@@ -46,6 +46,8 @@ class SwerveDriveConfig {
   /** Factor to correct gyro lag when simultaneously applying azimuth and drive. */
   double gyroRateCoeff = 0.0;
 
+  bool enableSmartDashboardOutput = true;
+
 };
 
 }
