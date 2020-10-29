@@ -36,7 +36,7 @@ void Thirdcoast::AzimuthZeroTuner::update(std::shared_ptr<Thirdcoast::SwerveDriv
     setpoint = Util::limit(setpoint, 0, 4096);
     if (enable)
     {
-        drive->getWheels().at(mWheelChooser.GetSelected())->setAzimuthPosition(setpoint);
+        //drive->getWheels().at(mWheelChooser.GetSelected())->setAzimuthPosition(setpoint);
     }
 
     if (save)

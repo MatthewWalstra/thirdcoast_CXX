@@ -21,7 +21,7 @@ class Util {
      */
     static bool epsilonEquals(double x, double y, double epsilon)
     {
-        return ((x - kEpsilon <= y) && (x + kEpsilon >= y));
+        return ((x - epsilon <= y) && (x + epsilon >= y));
     }
     /**
      * Calculates whether two doubles are equal with standard kEpsilon = 1E-6

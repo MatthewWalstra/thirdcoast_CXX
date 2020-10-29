@@ -13,6 +13,7 @@ void Robot::RobotInit()
     drive = configSwerve();
 
     drive->getGyro()->ZeroYaw();
+
 }
 
 void Robot::RobotPeriodic() 
@@ -27,6 +28,7 @@ void Robot::TeleopInit()
 {
     drive->zeroAzimuthEncoders();
     drive->setDriveMode(Thirdcoast::Wheel::TELEOP);
+    drive->setFieldOriented(true);
 }
 
 void Robot::TeleopPeriodic() 
@@ -36,39 +38,45 @@ void Robot::TeleopPeriodic()
     frc::SmartDashboard::PutNumber("Forward (Pre Expo)", getForward());
     frc::SmartDashboard::PutNumber("Strafe (Pre Expo)", getStrafe());
     frc::SmartDashboard::PutNumber("Yaw (Pre Expo)", getYaw());
+    
     /*
+    double yaw = getYaw();
+    double forward = getForward();
+    double strafe = -getStrafe();
+    drive->drive(forward, strafe, yaw);
+    */
+
+    
     double yaw = yawExpo.apply(getYaw());
     double forward = driveExpo.apply(getForward());
-    double strafe = driveExpo.apply(-getStrafe());
+    double strafe = driveExpo.apply(getStrafe());
     
-    //double yaw = getYaw();
-    //double forward = getForward();
-    //double strafe = getStrafe();
+    
 
     frc::SmartDashboard::PutNumber("Yaw", yaw);
     frc::SmartDashboard::PutNumber("Forward", forward);
     frc::SmartDashboard::PutNumber("Strafe", strafe);
 
-    //forward = Util::limit(forward, Constants::MAX_FWD_STR);
-    //strafe = Util::limit(strafe, Constants::MAX_FWD_STR);
-    //yaw = Util::limit(yaw, Constants::MAX_YAW);
+    forward = Util::limit(forward, Constants::MAX_FWD_STR);
+    strafe = Util::limit(strafe, Constants::MAX_FWD_STR);
+    yaw = Util::limit(yaw, Constants::MAX_YAW);
 
-    //std::array<double, 2> output = vectorLimit.apply(forward, strafe);
+    std::array<double, 2> output = vectorLimit.apply(forward, strafe);
 
     //frc::SmartDashboard::PutNumber("Output Yaw", yaw);
     //frc::SmartDashboard::PutNumber("Output Forward", output[0]);
     //frc::SmartDashboard::PutNumber("Output Strafe", output[1]);
 
-    //drive->drive(output[0], output[1], yaw);
-    drive->drive(forward, strafe, yaw);
+    drive->drive(output[0], output[1], yaw);
     
-    */
+    
+    
     bool azimuth_save = getAzimuthSaveTrigger();
     bool azimuth_reset = getAzimuthResetTrigger();
     if (azimuth_save && azimuth_save != prev_save)
     {
         //save current position to each azimuth zero position
-        //drive->saveAzimuthPositions();
+        drive->saveAzimuthPositions();
         std::cout<<"Saving Azimuth Positions!"<<std::endl;
     }
     else if (azimuth_reset && azimuth_reset != prev_reset)
@@ -81,22 +89,78 @@ void Robot::TeleopPeriodic()
     prev_save = azimuth_save;
     prev_reset = azimuth_reset;
     
-    
-    double forward = getForward();
-    double strafe = getStrafe();
-    double yaw = getYaw();
-
-    drive->drive(forward, strafe, yaw);
 }
 
 void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
+void Robot::TestInit() 
+{
+    finished_circle = false;
+    finished_forward = false;
+    j = 0.0;
+}
 void Robot::TestPeriodic() 
 {
-    //azimuthTuner.update(drive);
+    /*
+    double timestamp = frc::Timer::GetFPGATimestamp(); 
 
+    if (timestamp - prev_timestamp > 1.0)
+    {
+        setpoint = prev_setpoint + .25 * (1 + i % 2) * (i % 4 == 1 || i % 4 == 2? -1.0:1.0);
+        std::cout<<setpoint<<std::endl;
+        prev_timestamp = timestamp;
+
+        //add noise +- .05
+        for (auto wheel: drive->getWheels())
+        {
+            wheel->set(setpoint + std::rand() % 100 /1000 - .05, .25, false);
+        }
+        
+        prev_setpoint = setpoint;
+        i++;
+    }
+    */
+
+   std::shared_ptr<Thirdcoast::Wheel> wheel = drive->getWheels().at(1);
+    /*
+   if (!finished_circle)
+   {
+       double azimuth = std::atan2(std::cos(j), std::sin(j)) * .5 / M_PI;
+       wheel->set(azimuth, .2, false);
+       j += circleStepsize;
+
+       finished_circle = j > 2.0 * M_PI? true:false;
+
+       if (finished_circle)
+       {
+           j = 0.0;
+           std::cout << "Finished Circle" << std::endl;
+       }
+
+       mWheelOutput << wheel->getString();
+   }
+
+   if (!finished_forward && finished_circle)
+   {
+       double drive = std::cos(j);
+       wheel->set(0.0, drive, false);
+
+       j += forwardStepsize;
+
+       finished_forward = j > 2.0 * M_PI? true:false;
+
+       if (finished_forward)
+       {
+           std::cout << "Finished forward and backwards" << std::endl;
+       }
+
+       mWheelOutput << wheel->getString();
+   }
+    
+    //drive->getWheels()[2]->set(setpoint, .25, false);
+    */
+    
 }
 
 double Robot::getForward()

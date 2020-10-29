@@ -7,6 +7,12 @@
 
 #pragma once
 
+#include <thirdcoast/g3log/g3log/g3log.hpp>
+#include <thirdcoast/g3log/g3log/logworker.hpp>
+#include <iomanip>
+#include <thread>
+#include <iostream>
+
 //#include "thirdcoast/util/Util.h"
 
 #include "thirdcoast/swerve/SwerveDrive.h"
@@ -24,6 +30,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 class Robot : public frc::TimedRobot {
   //declare controller and drive
@@ -34,6 +43,18 @@ class Robot : public frc::TimedRobot {
 
   bool prev_save = false;
   bool prev_reset = false;
+  double setpoint = 0.0;
+  double prev_setpoint = 0.0;
+  double prev_timestamp = 0.0;
+  int i = 0;
+  double j = 0.0;
+  double scalar = 2.0 * M_PI * frc::TimedRobot::kDefaultPeriod.value();
+  double circleStepsize = scalar / 3.0;
+  double forwardStepsize = scalar / .75;
+  bool finished_circle = false;
+  bool finished_forward = false;
+
+  std::fstream mWheelOutput;
 
   //declare rate limiters
   ExpoScale yawExpo{Constants::DEADBAND, Constants::YAW_EXPO};

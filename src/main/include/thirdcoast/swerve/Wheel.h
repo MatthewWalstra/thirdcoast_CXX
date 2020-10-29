@@ -49,6 +49,7 @@ class Wheel {
   int id = 0;
 
   int azimuth_zero = 0;
+  double azimuthError = 0.0;
 
   std::stringstream stream;
 
@@ -73,6 +74,7 @@ class Wheel {
    * @param drive the configured drive TalonSRX
    * @param driveSetpointMax scales closed-loop drive output to this value when drive setpoint = 1.0
    */
+  Wheel();
   Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax, int id);
 
   /**
@@ -156,6 +158,8 @@ class Wheel {
   bool isInverted(){return inverted;}
 
   std::string getString();
+
+  double getAzimuthError(){ return azimuthError; }
 
 };
 

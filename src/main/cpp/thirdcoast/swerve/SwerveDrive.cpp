@@ -11,8 +11,6 @@
 
 Thirdcoast::SwerveDrive::SwerveDrive(SwerveDriveConfig config) 
 {
-    //open wheel flip debugging file
-    mWheelOutput.open("/home/lvuser/Wheel_Data.txt", std::ios::out | std::ios::app);
 
     //Calculate Width and Length components
     gyro = config.gyro;
@@ -70,8 +68,8 @@ void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimut
     // autonomous starting positions.
     if (fieldOriented)
     {
-        //double angle = gyro->GetFusedHeading();
-        double angle = gyro->GetAngle();
+        double angle = gyro->GetFusedHeading();
+        //double angle = gyro->GetAngle();
         angle += gyro->GetRate() * kGyroRateCorrection;
         angle = std::fmod(angle, 360.0);
 
@@ -110,59 +108,9 @@ void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimut
 
     for(int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
     {
-        wheels.at(i)->set(wa.at(i), ws.at(i), enableSmartDashboardOutput);
+        wheels.at(i)->set(wa.at(i), ws.at(i), !(Util::epsilonEquals(forward, 0.0, .05) && Util::epsilonEquals(strafe, 0.0, .05)));
     }
-
-    for(int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
-    {
-        mWheelOutput << wheels.at(i)->getString();
-    }
-}
-
-void Thirdcoast::SwerveDrive::generateTestCases()
-{
-    std::fstream mOutput;
-    //mOutput.open("Swerve_output_test_c++.csv", std::ios::out | std::ios::app);
-    mOutput.open("Swerve_output_test_c++.csv", std::ios::out);
-    if (mOutput)
-    {
-        mOutput << "forward, strafe, yaw, angle, ws[0], wa[0], ws[1], wa[1], ws[2], wa[2], ws[3], wa[3], " << std::endl;
-    }
-
-    double angle = 0.0;
-      double forward = -1.0;
-      double strafe = -1.0;
-      double yaw = -1.0;
-
-      //iterate through inputs by 30 degrees and .4
-      double angle_step = 30.0;
-      double value_step = 0.4;
-      while (angle <= 360.0)
-      {
-        forward = -1.0;
-        while (forward <= 1.0)
-        {
-          strafe = -1.0;
-          while (strafe <= 1.0)
-          {
-            yaw = -1.0;
-            while (yaw <= 1.0)
-            {
-
-              //drive(forward, strafe, yaw, angle);
-              mOutput << Util::sstr(forward) + ", " + Util::sstr(strafe) + ", " + Util::sstr(yaw) + ", " + Util::sstr(angle) + ", " + Util::sstr(ws[0]) + ", " + Util::sstr(wa[0]) + ", " + Util::sstr(ws[1]) + ", " + Util::sstr(wa[1]) + ", " + Util::sstr(ws[2]) + ", " + Util::sstr(wa[2]) + ", " + Util::sstr(ws[3]) + ", " + Util::sstr(wa[3]) + ", " << std::endl;
-              
-              yaw += value_step;
-            }
-            strafe += value_step;
-          }
-          forward += value_step;
-        }
-        angle += angle_step;
-      }
-
-    mOutput.flush();
-    mOutput.close();
+   
 }
 
 void Thirdcoast::SwerveDrive::stop()
@@ -199,5 +147,14 @@ void Thirdcoast::SwerveDrive::zeroAzimuthEncoders(frc::Preferences *prefs)
         int position = ZeroPositions[i];//prefs->GetInt(getPreferenceKeyForWheel(i), DEFAULT_ABSOLUTE_AZIMUTH_OFFSET);
         
         wheels.at(i)->setAzimuthZero(position);
+    }
+}
+
+void Thirdcoast::SwerveDrive::outputSmartDashboard()
+{
+    for (int i = 0; i < SwerveDriveConfig::WHEEL_COUNT; i++)
+    {
+        frc::SmartDashboard::PutNumber("Azimuth Setpoint: " + Util::sstr(i), wa[i]);
+        frc::SmartDashboard::PutNumber("Drive Setpoint: " + Util::sstr(i), ws[i]);
     }
 }

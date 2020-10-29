@@ -34,10 +34,10 @@ namespace Thirdcoast {
  * 
  * Forward: Azimuth controller CAN IDs (+10 for drive motor controller)
  * 
- * 0     1
- *  * * * 
- *  * * *
- * 2     3 
+ *  0 * * 1
+ *  *  *  * 
+ *  *  *  *
+ *  2 * * 3 
  *
  * <p>Derivation of inverse kinematic equations are from Ether's <a
  * href="https://www.chiefdelphi.com/media/papers/2426">Swerve Kinematics and Programming</a>.
@@ -57,12 +57,11 @@ class SwerveDrive {
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> ws = {0.0, 0.0, 0.0, 0.0};
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> wa  = {0.0, 0.0, 0.0, 0.0};
 
-  std::array<int, SwerveDriveConfig::WHEEL_COUNT> ZeroPositions  = {48112, -47876, 13236, -4385};
-
+  std::array<int, SwerveDriveConfig::WHEEL_COUNT> ZeroPositions  = {13236 % 4096, -4385 % 4096, 48112 % 4096, -47876 % 4096};
   bool fieldOriented;
   bool enableTuning = false;
   bool enableSmartDashboardOutput = true;
-  std::fstream mWheelOutput;
+
 
  public:
 
@@ -100,9 +99,6 @@ class SwerveDrive {
    * @param azimuth robot rotation, from -1.0 (CCW) to 1.0 (CW)
    */
   void drive(double forward, double strafe, double azimuth);
-
-  //currently broken, add 4th argument angle to drive
-  void generateTestCases();
 
   /**
    * Stops all wheels' azimuth and drive movement. Calling this in the robots {@code teleopInit} and
