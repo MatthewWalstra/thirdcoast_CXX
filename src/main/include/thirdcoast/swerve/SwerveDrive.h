@@ -57,7 +57,7 @@ class SwerveDrive {
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> ws = {0.0, 0.0, 0.0, 0.0};
   std::array<double, SwerveDriveConfig::WHEEL_COUNT> wa  = {0.0, 0.0, 0.0, 0.0};
 
-  std::array<int, SwerveDriveConfig::WHEEL_COUNT> ZeroPositions  = {48112, -47876, 13236, -4385};
+  std::array<int, SwerveDriveConfig::WHEEL_COUNT> ZeroPositions  = {13236 % 4096, -4385 % 4096, 48112 % 4096, -47876 % 4096};
 
   bool fieldOriented;
   bool enableTuning = false;
