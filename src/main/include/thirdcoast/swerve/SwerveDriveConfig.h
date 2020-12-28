@@ -39,9 +39,9 @@ struct PIDFSlot
     } else
     {
       //Drive: TODO - get better defaults
-      kP = 0.05;
+      kP = 2.0;
       kI = 0.0005;
-      kD = 0.0;
+      kD = 30.0;
       kF = 0.032;
       kIZone = 1000.0;
       kAllowableError = 0.0;

@@ -23,7 +23,7 @@ rev::CANSparkMax::MotorType SparkMaxWrapper::getRevMotorType(MotorControllerConf
         case MotorControllerConfig::MotorType::BRUSHLESS:
             return rev::CANSparkMax::MotorType::kBrushless;
         default:
-            //frc::DriverStation::ReportError("Unexpected Motor Type: " + type);
+            frc::DriverStation::ReportError("Unexpected Motor Type: " + type);
             //LOG_WARN << "Unexpected Motor Type: " << type;
 			return rev::CANSparkMax::MotorType::kBrushless;
 
@@ -43,7 +43,7 @@ rev::CANEncoder::EncoderType SparkMaxWrapper::getRevFeedbackDevice(MotorControll
         case MotorControllerConfig::FeedbackSensor::INTEGRATED_SENSOR:
             if (type == MotorControllerConfig::BRUSHED)
             {
-                //frc::DriverStation::ReportError("Brushed Motor doesn't have an integrated Sensor");
+                frc::DriverStation::ReportError("Brushed Motor doesn't have an integrated Sensor");
 				//LOG_WARN << "Brushed Motor doesn't have an integrated Sensor: " << type;
 				return rev::CANEncoder::EncoderType::kNoSensor;
             }
@@ -53,13 +53,13 @@ rev::CANEncoder::EncoderType SparkMaxWrapper::getRevFeedbackDevice(MotorControll
 		case MotorControllerConfig::FeedbackSensor::CAN_CODER:
 			return rev::CANEncoder::EncoderType::kNoSensor;
 		case MotorControllerConfig::FeedbackSensor::CTRE_MAG_ENCODER:
-			//frc::DriverStation::ReportError("Unsupported Spark Max Sensor Type: " + sensor);
+			frc::DriverStation::ReportError("Unsupported Spark Max Sensor Type: " + sensor);
             //LOG_WARN << "Unsupported Spark Max Sensor Type: " << sensor;
 
 			return rev::CANEncoder::EncoderType::kNoSensor;
 		
 		default:
-            //frc::DriverStation::ReportError("Unexpected Motor Type: " + sensor);
+            frc::DriverStation::ReportError("Unexpected Motor Type: " + sensor);
             //LOG_WARN << "Unexpected Sensor Type: " << sensor;
 			return rev::CANEncoder::EncoderType::kHallSensor;
     }
@@ -74,7 +74,7 @@ rev::CANSparkMax::IdleMode SparkMaxWrapper::getRevIdleMode(MotorControllerConfig
         case MotorControllerConfig::NeutralMode::COAST:
             return rev::CANSparkMax::IdleMode::kCoast;
 		default:
-			//frc::DriverStation::ReportError("Unexpected Idle Mode: " + Util::sstr(mode) + ", Returning Coast");
+			frc::DriverStation::ReportError("Unexpected Idle Mode: " + Util::sstr(mode) + ", Returning Coast");
 			//LOG_WARN << "Unexpected Idle Mode: " << mode;
 			return rev::CANSparkMax::IdleMode::kCoast;
     }
@@ -143,7 +143,7 @@ bool SparkMaxWrapper::handleREVCanError(int id, rev::CANError error, const std::
       
       
     	}
-	//frc::DriverStation::ReportError("Could not configure spark id: " + std::to_string(id) + " error: " + error_name + " method: "+ method_name);
+	frc::DriverStation::ReportError("Could not configure spark id: " + std::to_string(id) + " error: " + error_name + " method: "+ method_name);
 	//LOG_WARN << "Could not configure spark id: " << id << ", error: " << error_name << ", method: " << method_name;
 	return false;
 
@@ -173,7 +173,7 @@ motorcontrol::FeedbackDevice TalonBaseWrapper::getCTREFeedbackDevice(MotorContro
 
 			return motorcontrol::FeedbackDevice::IntegratedSensor;
 		default:
-			//frc::DriverStation::ReportError("Unexpected feedback sensor: " + Util::sstr(sensor) + ", Returning default PWM sensor");
+			frc::DriverStation::ReportError("Unexpected feedback sensor: " + Util::sstr(sensor) + ", Returning default PWM sensor");
 			//LOG_WARN << "Unexpected Feedback Device: " << sensor;
 			return motorcontrol::FeedbackDevice::None;
 	}
@@ -188,7 +188,7 @@ motorcontrol::NeutralMode TalonBaseWrapper::getCTRENeutralMode(MotorControllerCo
 		case MotorControllerConfig::NeutralMode::COAST:
 			return motorcontrol::NeutralMode::Coast;
 		default:
-			//frc::DriverStation::ReportError("Unexpected Neutral Mode: " + mode);
+			frc::DriverStation::ReportError("Unexpected Neutral Mode: " + mode);
 			//LOG_WARN << "Unexpected Neutral Mode: " << mode;
 			return motorcontrol::NeutralMode::Coast;
 	}
@@ -214,7 +214,7 @@ motorcontrol::ControlMode TalonBaseWrapper::getCTREControlMode()
 		case MotorControllerWrapper::DriveMode::AZIMUTH:
 			return motorcontrol::ControlMode::PercentOutput;
 		default:
-			//frc::DriverStation::ReportError("Unknown Drive Mode: " + std::to_string(id));
+			frc::DriverStation::ReportError("Unknown Drive Mode: " + std::to_string(id));
 			//LOG_WARN << "Unknown Drive Mode: " << id;
 			return motorcontrol::ControlMode::PercentOutput;
 
@@ -407,7 +407,7 @@ rev::ControlType SparkMaxWrapper::getRevControlType()
 		case MotorControllerWrapper::DriveMode::AZIMUTH:
 			return rev::ControlType::kDutyCycle;
 		default:
-			//frc::DriverStation::ReportError("Unknown Drive Mode: " + std::to_string(id));
+			frc::DriverStation::ReportError("Unknown Drive Mode: " + std::to_string(id));
 			//LOG_WARN << "Unknown Drive Mode: " << id;
 			return rev::ControlType::kDutyCycle;
 
@@ -417,7 +417,7 @@ rev::ControlType SparkMaxWrapper::getRevControlType()
 SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 {
 
-	std::cout <<"Constructing SparkMax, id: " << id << std::endl;
+	
     //setup spark max
 	bool rc = true;
     isAzimuth = config.isAzimuth;
@@ -426,6 +426,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	sparkMax = std::make_shared<rev::CANSparkMax>(id, getRevMotorType(config.motorType));
     
 	pidController = std::make_shared<rev::CANPIDController>(sparkMax->GetPIDController());
+	std::cout <<"Constructing SparkMax, id: " << id <<", firmware version: " << sparkMax->GetFirmwareString() << std::endl;
 	rc &= handleREVCanError(id, sparkMax->RestoreFactoryDefaults(), "RestoreFactoryDefaults()");
 
     //config PID slots
@@ -436,7 +437,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot0.kIZone, 0), "SetIZone(0)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot0.kMaxIAccum, 0), "SetIMaxAccum(0)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 0), "SetSmartMotionMaxVelocity(0)");
-	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 0), "SetSmartMotionAcceleration(0)");
+	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 0), "SetSmartMotionAcceleration(0)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot0.kAllowableError, 0), "SetSmartMotionAllowableError(0)");
 
 	rc &= handleREVCanError(id, pidController->SetP(config.slot1.kP, 1), "SetP(1)");
@@ -446,7 +447,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot1.kIZone, 1), "SetIZone(1)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot1.kMaxIAccum, 1), "SetIMaxAccum(1)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 1), "SetSmartMotionMaxVelocity(1)");
-	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 1), "SetSmartMotionAcceleration(1)");
+	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 1), "SetSmartMotionAcceleration(1)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot1.kAllowableError, 1), "SetSmartMotionAllowableError(1)");
 
 	rc &= handleREVCanError(id, pidController->SetP(config.slot2.kP, 2), "SetP(2)");
@@ -456,7 +457,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot2.kIZone, 2), "SetIZone(2)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot2.kMaxIAccum, 2), "SetIMaxAccum(2)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 2), "SetSmartMotionMaxVelocity(2)");
-	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 2), "SetSmartMotionAcceleration(2)");
+	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 2), "SetSmartMotionAcceleration(2)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot2.kAllowableError, 2), "SetSmartMotionAllowableError(2)");
 
 	rc &= handleREVCanError(id, pidController->SetP(config.slot3.kP, 3), "SetP(3)");
@@ -466,14 +467,14 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot3.kIZone, 3), "SetIZone(3)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot3.kMaxIAccum, 3), "SetIMaxAccum(3)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 3), "SetSmartMotionMaxVelocity(3)");
-	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 3), "SetSmartMotionAcceleration(3)");
+	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 3), "SetSmartMotionAcceleration(3)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot3.kAllowableError, 3), "SetSmartMotionAllowableError(3)");
 
-	rc &= handleREVCanError(id, sparkMax->SetSmartCurrentLimit(config.continuousCurrentLimit), "SetSmartCurrentLimit()");
-	rc &= handleREVCanError(id, sparkMax->SetSecondaryCurrentLimit(config.peakCurrentLimit), "SetSecondaryCurrentLimit()");
+	//rc &= handleREVCanError(id, sparkMax->SetSmartCurrentLimit(config.continuousCurrentLimit), "SetSmartCurrentLimit()");
+	//rc &= handleREVCanError(id, sparkMax->SetSecondaryCurrentLimit(config.peakCurrentLimit), "SetSecondaryCurrentLimit()");
 	rc &= handleREVCanError(id, sparkMax->EnableVoltageCompensation(config.voltageCompensation), "EnableVoltageCompensation()");
 	rc &= handleREVCanError(id, sparkMax->SetIdleMode(getRevIdleMode(config.neutralMode)), "SetIdleMode()");
-
+	
 	//TODO: add Feedback device?
 
 	// Rotations -> Ticks (same as Talons)
@@ -494,7 +495,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 		pid = std::make_shared<frc2::PIDController>(config.slot0.kP, config.slot0.kI, config.slot0.kD);
 	} else
 	{
-		encoder = std::make_shared<rev::CANEncoder>(sparkMax->GetEncoder());
+		//encoder = std::make_shared<rev::CANEncoder>(sparkMax->GetEncoder());
 		
 		//TODO: add integrated sensor?
 
@@ -529,10 +530,18 @@ void SparkMaxWrapper::set(double output)
 	} else
 	{
 		//Integrated
-		//sparkMax->GetPIDController().SetReference(output, getRevControlType(), slot);
-		frc::SmartDashboard::PutNumber("SparkMax Output " + std::to_string(id), output);	
+		//pidController->SetReference(output, getRevControlType(), slot);
+		//pidController->SetReference(output, rev::ControlType::kVelocity, slot);
 		sparkMax->Set(output);
+		frc::SmartDashboard::PutNumber("SparkMax Output " + std::to_string(id), output);	
+		frc::SmartDashboard::PutNumber("SparkMax Get Output" + std::to_string(id), sparkMax->Get());	
+		
 	}
+	
+	//frc::SmartDashboard::PutNumber("SparkMax Set Output " + std::to_string(id), output);
+	//pidController->SetReference(output, rev::ControlType::kDutyCycle, slot);
+	//sparkMax->Set(output);
+	
 }
 
 void SparkMaxWrapper::setSensorPosition(double position)

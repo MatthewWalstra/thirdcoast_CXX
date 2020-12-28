@@ -85,9 +85,7 @@ void Robot::DisabledPeriodic() {}
 
 void Robot::TestInit() 
 {
-    finished_circle = false;
-    finished_forward = false;
-    j = 0.0;
+    
 }
 void Robot::TestPeriodic() 
 {
