@@ -1,8 +1,13 @@
 #pragma once
 
 #include <string>
-#include <math.h>
+#if defined(_USE_MATH_DEFINES) && !defined(_MATH_DEFINES_DEFINED)
+    #define _USE_MATH_DEFINES
+#endif
+#include <cmath>
 #include <iomanip>
+
+#include "Constants.h"
 
 
 class Util {
@@ -47,12 +52,12 @@ class Util {
 
     static double degToRads(double degrees)
     {
-        return degrees * M_PI / 180.0;
+        return degrees * Constants::PI / 180.0;
     }
 
     static double radsToDeg(double radians)
     {
-        return radians * 180.0 / M_PI;
+        return radians * 180.0 / Constants::PI;
     }
 
     static double limit(double v, double min, double max)

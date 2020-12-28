@@ -7,19 +7,19 @@
 
 #pragma once
 
-#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINES
 #include <cmath>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <iomanip>
 
-#include <ctre/Phoenix.h>
-#include <rev/CANSparkMax.h>
+#include "thirdcoast/swerve/MotorControllerWrapper.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
 #include "thirdcoast/util/Util.h"
+#include "thirdcoast/swerve/MotorControllerWrapper.h"
 
 /**
  * Controls a swerve drive wheel azimuth and drive motors.
@@ -40,11 +40,10 @@
 namespace Thirdcoast {
 
 class Wheel {
-  const int TICKS = 4096;
-
+  
   double driveSetpointMax;
-  std::shared_ptr<TalonSRX> azimuthController;
-  std::shared_ptr<rev::CANSparkMax> driveController;
+  std::shared_ptr<MotorControllerWrapper> azimuthController;
+  std::shared_ptr<MotorControllerWrapper> driveController;
   bool inverted = false;
   int id = 0;
 
@@ -55,13 +54,7 @@ class Wheel {
 
   
  public:
-  enum DriveMode {
-    OPEN_LOOP,
-    CLOSED_LOOP,
-    TELEOP,
-    TRAJECTORY,
-    AZIMUTH
-  } driveMode;
+  
   /**
    * This constructs a wheel with supplied azimuth and drive talons.
    *
@@ -75,7 +68,7 @@ class Wheel {
    * @param driveSetpointMax scales closed-loop drive output to this value when drive setpoint = 1.0
    */
   Wheel();
-  Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev::CANSparkMax> drive, double driveSetpointMax, int id);
+  Wheel(std::shared_ptr<MotorControllerWrapper> azimuth, std::shared_ptr<MotorControllerWrapper> drive, double driveSetpointMax, int id);
 
   /**
    * This method calculates the optimal driveTalon settings and applies them.
@@ -108,7 +101,7 @@ class Wheel {
    *
    * @param driveMode the desired drive mode
    */
-  void setDriveMode(DriveMode driveMode);
+  void setDriveMode(MotorControllerWrapper::DriveMode driveMode);
 
   /**
    * Stop azimuth and drive movement. This resets the azimuth setpoint and relative encoder to the
@@ -144,14 +137,14 @@ class Wheel {
    *
    * @return azimuth controller instance used by wheel
    */
-  std::shared_ptr<TalonSRX> getAzimuthController(){return azimuthController;}
+  std::shared_ptr<MotorControllerWrapper> getAzimuthController(){return azimuthController;}
 
   /**
    * Get the drive controller.
    *
    * @return drive controller instance used by wheel
    */
-  std::shared_ptr<rev::CANSparkMax> getDriveTalon(){return driveController;}
+  std::shared_ptr<MotorControllerWrapper> getDriveTalon(){return driveController;}
 
   double getDriveSetpointMax(){return driveSetpointMax;}
 

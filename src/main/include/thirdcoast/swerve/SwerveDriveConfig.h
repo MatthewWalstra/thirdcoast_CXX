@@ -13,8 +13,6 @@
 #include <vector>
 #include <memory>
 
-#include "thirdcoast/swerve/Wheel.h"
-
 namespace Thirdcoast {
 
 //forward declare swerve drive and wheel classes to avoid circular dependencies
@@ -60,32 +58,33 @@ struct PIDFSlot
 class MotorControllerConfig
 {
   private:
-    bool isAzimuth = true;
+    
   public:
-
+    bool isAzimuth = true;
+    int feedbackChannel = -1;
     /** Supported Feedback Sensors **/
     enum FeedbackSensor
     {
       CTRE_MAG_ENCODER,
       CAN_CODER,
       THRIFTY_CODER,
-      INTERNAL_SENSOR
+      INTEGRATED_SENSOR
     } feedbackSensor = CTRE_MAG_ENCODER;
 
     /** Supported Drive Motor Controllers **/
-    enum DriveMotorController
+    enum class DriveMotorController
     {
       SPARK_MAX,
       TALON_FX
-    } driveController = SPARK_MAX;
+    } driveController = DriveMotorController::SPARK_MAX;
 
     /** Supported Azimuth Motor Controllers **/
-    enum AzimuthMotorController
+    enum class AzimuthMotorController
     {
-      Victor_SPX,
+      VICTOR_SPX,
       TALON_SRX,
-      SPARK_MAX_550,
-    } azimuthController = TALON_SRX;
+      SPARK_MAX
+    } azimuthController = AzimuthMotorController::TALON_SRX;
 
     /** Motor Controller Neutral Modes **/
     enum NeutralMode
@@ -102,7 +101,7 @@ class MotorControllerConfig
     } motorType = BRUSHLESS;
 
     /**
-     * maxCurrentLimit -> Talon: peakCurrentLimit, SparkMax: secondaryCurrentLimit
+     * peakCurrentLimit -> Talon: peakCurrentLimit, SparkMax: secondaryCurrentLimit
      * continuousCurrentLimit -> Talon: continuousCurrentLimit, SparkMax: smartCurrentLimit
      * 
      * motionAcceleration -> Talon: motionAcceleration, SparkMax.PIDController: smartMotionAcceleration
@@ -111,7 +110,7 @@ class MotorControllerConfig
      * voltageCompensation -> Talon: voltageCompSaturation, SparkMax: voltageCompensation
      * 
     **/
-    double maxCurrentLimit, continuousCurrentLimit, motionAcceleration, motionCruiseVelocity, voltageCompensation = 0.0;
+    double peakCurrentLimit, continuousCurrentLimit, motionAcceleration, motionCruiseVelocity, voltageCompensation = 0.0;
     
     MotorControllerConfig(AzimuthMotorController azimuth, FeedbackSensor sensor): isAzimuth(true)
     {
@@ -119,6 +118,12 @@ class MotorControllerConfig
       azimuthController = azimuth;
       feedbackSensor = sensor;
       neutralMode = COAST;
+      peakCurrentLimit = 30.0;
+      continuousCurrentLimit = 15.0;
+      motionAcceleration = 10000.0;
+      motionCruiseVelocity = 800.0;
+      voltageCompensation = 12.0;
+
     }
 
     MotorControllerConfig(DriveMotorController drive, FeedbackSensor sensor): isAzimuth(false)
@@ -127,9 +132,12 @@ class MotorControllerConfig
       driveController = drive;
       feedbackSensor = sensor;
       neutralMode = BRAKE;
+
+      peakCurrentLimit = 80.0;
+      continuousCurrentLimit = 60.0;
     }
     
-    //4 slots for each motor controller
+    //4 slots for each motor controller -- might need to be moved inside constructor
     PIDFSlot slot0 = PIDFSlot(isAzimuth);
     PIDFSlot slot1 = PIDFSlot(isAzimuth);
     PIDFSlot slot2 = PIDFSlot(isAzimuth);
@@ -182,8 +190,8 @@ class SwerveDriveConfig {
   bool enableSmartDashboardOutput = true;
 
   /** Configs for the azimuth and drive motor controllers **/
-  MotorControllerConfig azimuthConfig{MotorControllerConfig::TALON_SRX, MotorControllerConfig::CTRE_MAG_ENCODER};
-  MotorControllerConfig driveConfig{MotorControllerConfig::SPARK_MAX, MotorControllerConfig::INTERNAL_SENSOR};
+  MotorControllerConfig azimuthConfig{MotorControllerConfig::AzimuthMotorController::TALON_SRX, MotorControllerConfig::FeedbackSensor::CTRE_MAG_ENCODER};
+  MotorControllerConfig driveConfig{MotorControllerConfig::DriveMotorController::SPARK_MAX, MotorControllerConfig::FeedbackSensor::INTEGRATED_SENSOR};
 
 };
 

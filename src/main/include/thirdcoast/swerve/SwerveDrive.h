@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <memory>
-#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINES
 #include <cmath>
 #include <iostream>
 #include <fstream>
@@ -80,7 +80,7 @@ class SwerveDrive {
    *
    * @param driveMode the drive mode
    */
-  void setDriveMode(Wheel::DriveMode driveMode);
+  void setDriveMode(MotorControllerWrapper::DriveMode driveMode);
 
   /**
    * Set all four wheels to specified values.

@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "thirdcoast/swerve/SwerveDrive.h"
-
+#include "Constants.h"
 //using namespace Thirdcoast;
 
 Thirdcoast::SwerveDrive::SwerveDrive(SwerveDriveConfig config) 
@@ -45,7 +45,7 @@ std::string Thirdcoast::SwerveDrive::getPreferenceKeyForWheel(int wheel)
     return "SwerveDrive/wheel." + Util::sstr(wheel);
 }
 
-void Thirdcoast::SwerveDrive::setDriveMode(Wheel::DriveMode driveMode)
+void Thirdcoast::SwerveDrive::setDriveMode(Thirdcoast::MotorControllerWrapper::DriveMode driveMode)
 {
     for (auto wheel : wheels)
     {
@@ -91,10 +91,10 @@ void Thirdcoast::SwerveDrive::drive(double forward, double strafe, double azimut
     ws.at(3) = std::hypot(a, c);
 
     // wheel azimuth
-    wa.at(0) = std::atan2(b, d) * 0.5 / M_PI;
-    wa.at(1) = std::atan2(b, c) * 0.5 / M_PI;
-    wa.at(2) = std::atan2(a, d) * 0.5 / M_PI;
-    wa.at(3) = std::atan2(a, c) * 0.5 / M_PI;
+    wa.at(0) = std::atan2(b, d) * 0.5 / Constants::PI;
+    wa.at(1) = std::atan2(b, c) * 0.5 / Constants::PI;
+    wa.at(2) = std::atan2(a, d) * 0.5 / Constants::PI;
+    wa.at(3) = std::atan2(a, c) * 0.5 / Constants::PI;
 
     // normalize
     const double maxWheelSpeed = std::max(std::max(ws.at(0), ws.at(1)), std::max(ws.at(2), ws.at(3)));

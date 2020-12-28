@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-
-#include <thirdcoast/g3log/g3log/g3log.hpp>
-#include <thirdcoast/g3log/g3log/logworker.hpp>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <iomanip>
 #include <thread>
 #include <iostream>
+#include "thirdcoast/nanoLog/NanoLog.hpp"
 
 //#include "thirdcoast/util/Util.h"
 
@@ -34,6 +34,10 @@
 #include <sstream>
 #include <string>
 
+#include <frc/controller/PIDController.h>
+
+
+
 class Robot : public frc::TimedRobot {
   //declare controller and drive
   ControlBoard::XBoxController controller{0};
@@ -48,7 +52,7 @@ class Robot : public frc::TimedRobot {
   double prev_timestamp = 0.0;
   int i = 0;
   double j = 0.0;
-  double scalar = 2.0 * M_PI * frc::TimedRobot::kDefaultPeriod.value();
+  double scalar = 2.0 * Constants::PI * frc::TimedRobot::kDefaultPeriod.value();
   double circleStepsize = scalar / 3.0;
   double forwardStepsize = scalar / .75;
   bool finished_circle = false;

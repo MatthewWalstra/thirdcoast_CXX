@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "thirdcoast/swerve/SwerveDrive.h"
+#include "thirdcoast/nanoLog/NanoLog.hpp"
 
 #include "Constants.h"
 
@@ -15,9 +16,9 @@ class SwerveMathTest : public ::testing::Test{
     protected:
     double pi= 3.14159265358979238463;
     double kEpsilon= 1E-4;
-    std::shared_ptr<Thirdcoast::SwerveDrive> drive;
+    //std::shared_ptr<Thirdcoast::SwerveDrive> drive;
 
-
+    /*
     std::shared_ptr<Thirdcoast::SwerveDrive> configSwerve()
     {
         Thirdcoast::SwerveDriveConfig config{};
@@ -82,10 +83,11 @@ class SwerveMathTest : public ::testing::Test{
 
         return wheels;
     }
-
+    */
     virtual void SetUp()
     {
         //drive = configSwerve();
+        //nanolog::initialize(nanolog::GuaranteedLogger(), "", "nanolog_filibuster", .025);
     }
     virtual void TearDown(){}
 
@@ -98,10 +100,19 @@ TEST_F(SwerveMathTest, Testdrive)
     //EXPECT_NEAR(.989949, drive->getWS()[0], kEpsilon);
     EXPECT_TRUE(true);
     //drive->generateTestCases();
+    /*
+    int i = 0;
+    while (i < 10000)
+    {
+        LOG_CRIT << "Logging: " << i;
+        i += 1;
+    }
+    */
 }
 
 TEST_F(SwerveMathTest, TestWheel)
 {
+    /*
     //Azimuth -.25 to -.5 and .25 to .5: inverted = true
     //Azimuth -.25 to 0 and .25 to 0: inverted = false
     EXPECT_FALSE(false);
@@ -163,5 +174,6 @@ TEST_F(SwerveMathTest, TestWheel)
 
     EXPECT_TRUE(wheel->isInverted());
     EXPECT_NEAR(wheel->getAzimuthError(), .1 * 4096, kEpsilon);
+    */
 
 }
