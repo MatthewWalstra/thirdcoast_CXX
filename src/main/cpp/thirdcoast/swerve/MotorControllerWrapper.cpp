@@ -427,6 +427,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
     
 	pidController = std::make_shared<rev::CANPIDController>(sparkMax->GetPIDController());
 	std::cout <<"Constructing SparkMax, id: " << id <<", firmware version: " << sparkMax->GetFirmwareString() << std::endl;
+	
 	rc &= handleREVCanError(id, sparkMax->RestoreFactoryDefaults(), "RestoreFactoryDefaults()");
 
     //config PID slots
@@ -437,9 +438,9 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot0.kIZone, 0), "SetIZone(0)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot0.kMaxIAccum, 0), "SetIMaxAccum(0)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 0), "SetSmartMotionMaxVelocity(0)");
-	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 0), "SetSmartMotionAcceleration(0)");
+	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 0), "SetSmartMotionAcceleration(0)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot0.kAllowableError, 0), "SetSmartMotionAllowableError(0)");
-
+	
 	rc &= handleREVCanError(id, pidController->SetP(config.slot1.kP, 1), "SetP(1)");
 	rc &= handleREVCanError(id, pidController->SetI(config.slot1.kI, 1), "SetI(1)");
 	rc &= handleREVCanError(id, pidController->SetD(config.slot1.kD, 1), "SetD(1)");
@@ -447,7 +448,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot1.kIZone, 1), "SetIZone(1)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot1.kMaxIAccum, 1), "SetIMaxAccum(1)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 1), "SetSmartMotionMaxVelocity(1)");
-	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 1), "SetSmartMotionAcceleration(1)");
+	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 1), "SetSmartMotionAcceleration(1)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot1.kAllowableError, 1), "SetSmartMotionAllowableError(1)");
 
 	rc &= handleREVCanError(id, pidController->SetP(config.slot2.kP, 2), "SetP(2)");
@@ -457,7 +458,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot2.kIZone, 2), "SetIZone(2)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot2.kMaxIAccum, 2), "SetIMaxAccum(2)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 2), "SetSmartMotionMaxVelocity(2)");
-	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 2), "SetSmartMotionAcceleration(2)");
+	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 2), "SetSmartMotionAcceleration(2)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot2.kAllowableError, 2), "SetSmartMotionAllowableError(2)");
 
 	rc &= handleREVCanError(id, pidController->SetP(config.slot3.kP, 3), "SetP(3)");
@@ -467,11 +468,11 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 	rc &= handleREVCanError(id, pidController->SetIZone(config.slot3.kIZone, 3), "SetIZone(3)");
 	rc &= handleREVCanError(id, pidController->SetIMaxAccum(config.slot3.kMaxIAccum, 3), "SetIMaxAccum(3)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxVelocity(config.motionCruiseVelocity, 3), "SetSmartMotionMaxVelocity(3)");
-	//rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 3), "SetSmartMotionAcceleration(3)");
+	rc &= handleREVCanError(id, pidController->SetSmartMotionMaxAccel(config.motionAcceleration, 3), "SetSmartMotionAcceleration(3)");
 	rc &= handleREVCanError(id, pidController->SetSmartMotionAllowedClosedLoopError(config.slot3.kAllowableError, 3), "SetSmartMotionAllowableError(3)");
-
-	//rc &= handleREVCanError(id, sparkMax->SetSmartCurrentLimit(config.continuousCurrentLimit), "SetSmartCurrentLimit()");
-	//rc &= handleREVCanError(id, sparkMax->SetSecondaryCurrentLimit(config.peakCurrentLimit), "SetSecondaryCurrentLimit()");
+	
+	rc &= handleREVCanError(id, sparkMax->SetSmartCurrentLimit(config.continuousCurrentLimit), "SetSmartCurrentLimit()");
+	rc &= handleREVCanError(id, sparkMax->SetSecondaryCurrentLimit(config.peakCurrentLimit), "SetSecondaryCurrentLimit()");
 	rc &= handleREVCanError(id, sparkMax->EnableVoltageCompensation(config.voltageCompensation), "EnableVoltageCompensation()");
 	rc &= handleREVCanError(id, sparkMax->SetIdleMode(getRevIdleMode(config.neutralMode)), "SetIdleMode()");
 	
@@ -495,7 +496,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 		pid = std::make_shared<frc2::PIDController>(config.slot0.kP, config.slot0.kI, config.slot0.kD);
 	} else
 	{
-		//encoder = std::make_shared<rev::CANEncoder>(sparkMax->GetEncoder());
+		encoder = std::make_shared<rev::CANEncoder>(sparkMax->GetEncoder());
 		
 		//TODO: add integrated sensor?
 
@@ -506,7 +507,7 @@ SparkMaxWrapper::SparkMaxWrapper(MotorControllerConfig config, int id)
 		//setVelocityFactor(Constants::TICKS/10)
 	}
 	
-
+	
 
 
 	if (!rc)

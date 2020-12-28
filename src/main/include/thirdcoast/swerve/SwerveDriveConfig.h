@@ -135,6 +135,7 @@ class MotorControllerConfig
 
       peakCurrentLimit = 80.0;
       continuousCurrentLimit = 60.0;
+      voltageCompensation = 12.0;
     }
     
     //4 slots for each motor controller -- might need to be moved inside constructor
