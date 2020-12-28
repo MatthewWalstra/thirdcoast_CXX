@@ -530,13 +530,18 @@ void SparkMaxWrapper::set(double output)
 	} else
 	{
 		//Integrated
-		//pidController->SetReference(output, getRevControlType(), slot);
+		pidController->SetReference(output, getRevControlType(), slot);
 		//pidController->SetReference(output, rev::ControlType::kVelocity, slot);
-		sparkMax->Set(output);
+		
 		frc::SmartDashboard::PutNumber("SparkMax Output " + std::to_string(id), output);	
 		frc::SmartDashboard::PutNumber("SparkMax Get Output" + std::to_string(id), sparkMax->Get());	
 		
 	}
+	
+	//frc::SmartDashboard::PutNumber("id: " + std::to_string(id), sparkMax->GetEncoder().GetPosition());
+	//frc::SmartDashboard::PutNumber("SparkMax Get Output" + std::to_string(id), sparkMax->Get());
+	//sparkMax->Set(output);
+	//frc::SmartDashboard::PutNumber("SparkMax Output " + std::to_string(id), output);	
 	
 	//frc::SmartDashboard::PutNumber("SparkMax Set Output " + std::to_string(id), output);
 	//pidController->SetReference(output, rev::ControlType::kDutyCycle, slot);

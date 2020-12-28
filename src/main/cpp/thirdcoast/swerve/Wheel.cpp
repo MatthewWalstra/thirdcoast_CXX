@@ -36,7 +36,7 @@ void Thirdcoast::Wheel::set(double azimuth, double drive, bool output_smartdashb
     azimuthError = std::fmod(azimuth - azimuthPosition, Constants::TICKS);
 
     //wrap ticks, so that it's between +-2048
-    azimuthError = azimuthError > Constants::TICKS / 2.0? azimuthError - Constants::TICKS : azimuthError;
+    azimuthError -= azimuthError > Constants::TICKS / 2.0? Constants::TICKS : 0.0;
 
     //azimuthError = std::copysign(std::fmod(std::abs(azimuth - azimuthPosition), TICKS), azimuth - azimuthPosition);
 
