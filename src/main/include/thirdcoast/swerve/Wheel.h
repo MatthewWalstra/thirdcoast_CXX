@@ -14,8 +14,6 @@
 #include <ctre/Phoenix.h>
 #include <rev/CANSparkMax.h>
 
-#include <frc/smartdashboard/SmartDashboard.h>
-
 #include "thirdcoast/util/Util.h"
 
 /**

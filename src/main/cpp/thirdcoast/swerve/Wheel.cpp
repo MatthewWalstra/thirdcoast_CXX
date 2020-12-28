@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "thirdcoast/swerve/Wheel.h"
+#include "frc/smartdashboard/SmartDashboard.h"
+#include "Constants.h"
 
 //using namespace Thirdcoast;
 
@@ -14,7 +16,6 @@ Thirdcoast::Wheel::Wheel(std::shared_ptr<TalonSRX> azimuth, std::shared_ptr<rev:
     azimuthController = azimuth;
     driveController = drive;
     this->driveSetpointMax = driveSetpointMax;
-    this->id = id;
     setDriveMode(DriveMode::TELEOP);
 }
 
@@ -26,10 +27,13 @@ void Thirdcoast::Wheel::set(double azimuth, double drive, bool output_smartdashb
         return;
     }
 
-    azimuth *= TICKS; //*= -TICKS; flip azimuth hardware configuration dependent
+    azimuth *= -TICKS; //*= -TICKS; flip azimuth hardware configuration dependent
 
     double azimuthPosition = azimuthController->GetSelectedSensorPosition(0);
     double azimuthError = std::fmod(azimuth - azimuthPosition, TICKS);
+
+    //azimuthError -= azimuthError > TICKS * .5 ? TICKS : 0.0;
+    azimuthError = azimuthError > TICKS / 2.0? azimuthError - TICKS : azimuthError;
 
     //minimize azimuth rotation, reversing drive if necessary
     
